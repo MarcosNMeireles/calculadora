@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Formulário com Bloqueio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script>
+    <script
+      type="text/javascript"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-chtml.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <h1 class="text-center">Calculadora</h1>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th class="text-center">Para tempo em Horas</th>
+          <th class="text-center">Para tempo em Minutos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center">
+            $$ \text{gotas} = \frac{\text{volume}}{\text{tempo} \times 3} $$
+          </td>
+          <td class="text-center">
+            $$ \text{gotas} = \frac{\text{volume}\times 20}{\text{tempo}} $$
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="container mt-5">
+      <form id="numero-form">
+        <div class="form-group">
+          <label for="volume">Volume (ml):</label>
+          <input
+            type="number"
+            class="form-control"
+            id="volume"
+            name="volume"
+            oninput="checkInputs()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="tempo">Tempo:</label>
+          <input
+            type="number"
+            class="form-control"
+            id="tempo"
+            name="tempo"
+            oninput="checkInputs()"
+          />
+        </div>
+
+        <select id="unidadeTempo" onchange="checkInputs()">
+          <option value="minutos">Minutos</option>
+          <option value="horas">Horas</option>
+        </select>
+        <br /><br />
+
+        <div class="form-group">
+          <label for="gotas">Gotas:</label>
+          <input
+            type="number"
+            class="form-control"
+            id="gotas"
+            name="gotas"
+            oninput="checkInputs()"
+          />
+        </div>
+
+        <button type="button" class="btn btn-warning" onclick="limparPagina()">
+          Limpar
+        </button>
+      </form>
+
+      <div id="mathjax-container"></div>
+      <br />
+      <div id="mathjax-container4"></div>
+      <br />
+      <div id="mathjax-container2"></div>
+      <br />
+      <div id="mathjax-container3"></div>
+      <br />
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+      function checkInputs() {
+        const volumeInput = document.getElementById("volume");
+        const tempoInput = document.getElementById("tempo");
+        const gotasInput = document.getElementById("gotas");
+        const unidadeTempo = document.getElementById("unidadeTempo").value;
+        const mensagem = document.getElementById("mensagem");
+        const mathjaxContainer = document.getElementById("mathjax-container");
+        const mathjaxContainer2 = document.getElementById("mathjax-container2");
+        const mathjaxContainer3 = document.getElementById("mathjax-container3");
+        const mathjaxContainer4 = document.getElementById("mathjax-container4");
+        let resultadoGotas;
+        let mensagemResultado;
+
+        // Calculo para GOTAS
+        if (volumeInput.value !== "" && tempoInput.value !== "") {
+          gotasInput.disabled = true;
+
+          if (
+            !isNaN(parseFloat(volumeInput.value)) &&
+            !isNaN(parseFloat(tempoInput.value))
+          ) {
+            if (unidadeTempo === "horas") {
+              resultadoGotas =
+                parseFloat(volumeInput.value) /
+                (parseFloat(tempoInput.value) * 3);
+              let taxa = parseFloat(tempoInput.value) * 3;
+
+              mathjaxContainer.innerHTML = `\\( \\text{gotas} = \\frac{${volumeInput.value}}{${tempoInput.value} \\times 3} \\)`;
+              mathjaxContainer2.innerHTML = `\\( \\text{gotas} = \\frac{${volumeInput.value}}{${taxa}} \\)`;
+
+              MathJax.typesetPromise([
+                mathjaxContainer,
+                mathjaxContainer2,
+              ]).then(() => {
+                console.log("Equações MathJax renderizadas com sucesso!");
+              });
+            } else if (unidadeTempo === "minutos") {
+              resultadoGotas =
+                (parseFloat(volumeInput.value) * 20) /
+                parseFloat(tempoInput.value);
+
+              let taxa = parseFloat(volumeInput.value) * 20;
+
+              mathjaxContainer.innerHTML = `\\( \\text{gotas} = \\frac{${volumeInput.value} \\times 20}{${tempoInput.value}} \\)`;
+              mathjaxContainer2.innerHTML = `\\( \\text{gotas} = \\frac{${taxa}}{${tempoInput.value}} \\)`;
+
+              MathJax.typesetPromise([
+                mathjaxContainer,
+                mathjaxContainer2,
+              ]).then(() => {
+                console.log("Equações MathJax renderizadas com sucesso!");
+              });
+            }
+
+            const parteDecimal = resultadoGotas - Math.floor(resultadoGotas);
+
+            if (parteDecimal > 0.4) {
+              resultadoGotas = Math.ceil(resultadoGotas);
+            } else {
+              resultadoGotas = Math.floor(resultadoGotas);
+            }
+
+            mathjaxContainer3.innerHTML = `\\( \\text{gotas} = ${resultadoGotas.toFixed(
+              2
+            )} \\)`;
+
+            MathJax.typesetPromise([mathjaxContainer3]).then(() => {
+              console.log("Equação MathJax renderizada com sucesso!");
+            });
+          } else {
+            mensagem.textContent = "";
+          }
+        }
+        // Calculo para o TEMPO
+        else if (volumeInput.value !== "" && gotasInput.value !== "") {
+          tempoInput.disabled = true;
+
+          if (
+            !isNaN(parseFloat(volumeInput.value)) &&
+            !isNaN(parseFloat(gotasInput.value))
+          ) {
+            let resultadoTempo;
+
+            if (unidadeTempo === "horas") {
+              resultadoTempo =
+                parseFloat(volumeInput.value) /
+                (parseFloat(gotasInput.value) * 3);
+
+              let taxa =
+                parseFloat(volumeInput.value) / parseFloat(gotasInput.value);
+
+              mathjaxContainer.innerHTML = `\\( ${gotasInput.value} = \\frac{${volumeInput.value}}{\\text{tempo} \\times 3} \\)`;
+              mathjaxContainer4.innerHTML = `\\( \\text{tempo} \\times 3 = \\frac{${volumeInput.value}}{${gotasInput.value}} \\)`;
+              mathjaxContainer2.innerHTML = `\\( \\text{tempo} = \\frac{${taxa}}{3} \\)`;
+
+              MathJax.typesetPromise([
+                mathjaxContainer,
+                mathjaxContainer2,
+                mathjaxContainer4,
+              ]).then(() => {
+                console.log("Equações MathJax renderizadas com sucesso!");
+              });
+            } else if (unidadeTempo === "minutos") {
+              resultadoTempo =
+                (parseFloat(volumeInput.value) * 20) /
+                parseFloat(gotasInput.value);
+
+              let taxa = parseFloat(volumeInput.value) * 20;
+
+              mathjaxContainer.innerHTML = `\\( ${gotasInput.value} = \\frac{${volumeInput.value} \\times 20}{\\text{tempo}} \\)`;
+              mathjaxContainer2.innerHTML = `\\( \\text{tempo} = \\frac{${taxa}}{${gotasInput.value}} \\)`;
+
+              MathJax.typesetPromise([
+                mathjaxContainer,
+                mathjaxContainer2,
+              ]).then(() => {
+                console.log("Equações MathJax renderizadas com sucesso!");
+              });
+            }
+
+            const parteDecimal = resultadoTempo - Math.floor(resultadoTempo);
+            if (parteDecimal > 0.4) {
+              resultadoTempo = Math.ceil(resultadoTempo);
+            } else {
+              resultadoTempo = Math.floor(resultadoTempo);
+            }
+
+            mathjaxContainer3.innerHTML = `\\( \\text{tempo} = ${resultadoTempo.toFixed(
+              2
+            )} \\)`;
+
+            MathJax.typesetPromise([mathjaxContainer3]).then(() => {
+              console.log("Equação MathJax renderizada com sucesso!");
+            });
+          } else {
+            mensagem.textContent = "";
+          }
+        }
+
+        // Calculo para o VOLUME
+        else if (tempoInput.value !== "" && gotasInput.value !== "") {
+          volumeInput.disabled = true;
+
+          if (
+            !isNaN(parseFloat(tempoInput.value)) &&
+            !isNaN(parseFloat(gotasInput.value))
+          ) {
+            let resultadoVolume;
+
+            if (unidadeTempo === "horas") {
+              resultadoVolume =
+                parseFloat(gotasInput.value) *
+                (parseFloat(tempoInput.value) * 3);
+
+              let taxa = parseFloat(tempoInput.value) * 3;
+
+              mathjaxContainer.innerHTML = `\\( ${gotasInput.value} = \\frac{\\text{volume}}{${tempoInput.value} \\times 3} \\)`;
+              mathjaxContainer4.innerHTML = `\\( \\text{volume} = ${gotasInput.value} \\cdot (${tempoInput.value} \\times 3) \\)`;
+              mathjaxContainer2.innerHTML = `\\( \\text{volume} = ${gotasInput.value} \\cdot ${taxa} \\)`;
+
+              MathJax.typesetPromise([
+                mathjaxContainer,
+                mathjaxContainer2,
+                mathjaxContainer4,
+              ]).then(() => {
+                console.log("Equações MathJax renderizadas com sucesso!");
+              });
+            } else if (unidadeTempo === "minutos") {
+              resultadoVolume =
+                (parseFloat(gotasInput.value) * parseFloat(tempoInput.value)) /
+                20;
+
+              let taxa =
+                parseFloat(tempoInput.value) * parseFloat(gotasInput.value);
+
+              mathjaxContainer.innerHTML = `\\( ${gotasInput.value} = \\frac{\\text{volume} \\times 20}{${tempoInput.value}} \\)`;
+              mathjaxContainer4.innerHTML = `\\( \\text{volume} = ${gotasInput.value} \\cdot ${tempoInput.value}  \\)`;
+              mathjaxContainer2.innerHTML = `\\( \\text{volume} = ${gotasInput.value} \\cdot \\frac{${taxa}}{20} \\)`;
+
+              MathJax.typesetPromise([
+                mathjaxContainer,
+                mathjaxContainer2,
+                mathjaxContainer4,
+              ]).then(() => {
+                console.log("Equações MathJax renderizadas com sucesso!");
+              });
+
+              mathjaxContainer3.innerHTML = `\\( \\text{volume} = ${resultadoTempo.toFixed(
+                2
+              )} \\)`;
+
+              MathJax.typesetPromise([mathjaxContainer3]).then(() => {
+                console.log("Equação MathJax renderizada com sucesso!");
+              });
+            }
+
+            mensagem.textContent = mensagemResultado;
+          } else {
+            mensagem.textContent = "";
+          }
+        } else {
+          volumeInput.disabled = false;
+          tempoInput.disabled = false;
+          gotasInput.disabled = false;
+          mensagem.textContent = "";
+        }
+      }
+
+      function resetForm() {
+        const volumeInput = document.getElementById("volume");
+        const tempoInput = document.getElementById("tempo");
+        const gotasInput = document.getElementById("gotas");
+        const mensagem = document.getElementById("mensagem");
+        const mathjaxContainers = [
+          document.getElementById("mathjax-container"),
+          document.getElementById("mathjax-container2"),
+          document.getElementById("mathjax-container3"),
+          document.getElementById("mathjax-container4"),
+        ];
+
+        volumeInput.value = "";
+        tempoInput.value = "";
+        gotasInput.value = "";
+        mensagem.textContent = "";
+
+        volumeInput.disabled = false;
+        tempoInput.disabled = false;
+        gotasInput.disabled = false;
+
+        mathjaxContainers.forEach((container) => {
+          container.innerHTML = "";
+        });
+
+        MathJax.typesetPromise().then(() => {
+          MathJax.typesetPromise(mathjaxContainers).then(() => {
+            console.log("Equações MathJax renderizadas com sucesso!");
+          });
+        });
+      }
+
+      function limparPagina() {
+        location.reload();
+      }
+    </script>
+  </body>
+</html>
